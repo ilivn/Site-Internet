@@ -185,6 +185,38 @@ dialog::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(3px); }
 }
 .btn:hover { filter: brightness(1.1); }
 
+.compare { color: var(--muted); font-size: 14px; margin: -6px 0 14px; }
+.compare strong { color: var(--accent); }
+
+.also { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.also h3 { font: 700 16px "Space Grotesk", sans-serif; margin: 0 0 4px; }
+.also p { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+.also-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.also-links a {
+  border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
+  font-size: 14px; text-decoration: none; color: var(--text);
+}
+.also-links a:hover { border-color: var(--accent); }
+
+/* ---------- Boutiques comparées ---------- */
+.section-intro { color: var(--muted); margin: -8px 0 18px; max-width: 760px; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.shop {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.shop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.shop h3 { font: 700 18px "Space Grotesk", sans-serif; margin: 0; }
+.shop-head a { font-size: 13px; }
+.shop p { margin: 0; color: var(--muted); font-size: 14px; }
+.shop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; }
+.tag {
+  font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  background: var(--border); color: var(--muted);
+}
+.tag-ok { background: rgba(182, 242, 74, .15); color: var(--accent); }
+.tag-warn { background: rgba(255, 184, 77, .15); color: #ffb84d; }
+
 /* ---------- Pied de page ---------- */
 .site-footer { margin-top: 48px; padding: 24px 0 40px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
 .site-footer p { margin: 4px 0; }

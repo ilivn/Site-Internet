@@ -69,6 +69,60 @@ function message(text, isError = false) {
 
 // --- Boutiques ----------------------------------------------------------
 
+// Boutiques présentées sur le site. "aliases" sert à les reconnaître dans la liste de CheapShark.
+// kind : "official" = boutique officielle ou revendeur agréé, "reseller" = revendeur de clés.
+const SHOPS = [
+  { name: "Steam", url: "https://store.steampowered.com/", kind: "official",
+    description: "La plateforme de référence du jeu PC, éditée par Valve." },
+  { name: "GOG", url: "https://www.gog.com/fr", kind: "official",
+    description: "Jeux sans DRM : une fois achetés, ils t'appartiennent vraiment." },
+  { name: "Epic Games Store", url: "https://store.epicgames.com/fr/", kind: "official",
+    description: "Boutique d'Epic Games, connue pour ses jeux offerts chaque semaine." },
+  { name: "Humble Store", url: "https://www.humblebundle.com/store", kind: "official",
+    description: "Une partie de chaque achat est reversée à des associations caritatives." },
+  { name: "Gamesplanet", url: "https://fr.gamesplanet.com/", kind: "official",
+    description: "Clés officielles, promotions régulières et service client francophone." },
+  { name: "Fanatical", url: "https://www.fanatical.com/fr", kind: "official",
+    description: "Spécialiste des bundles et des offres promotionnelles sur PC." },
+  { name: "DLGamer", url: "https://www.dlgamer.fr/fr", kind: "official",
+    description: "Boutique française de jeux dématérialisés, catalogue PC et Xbox." },
+  { name: "Green Man Gaming", url: "https://www.greenmangaming.com/", aliases: ["GreenManGaming"], kind: "official",
+    description: "Revendeur officiel : clés issues des éditeurs et distributeurs." },
+  { name: "Instant Gaming", url: "https://www.instant-gaming.com/fr/", kind: "reseller",
+    description: "Revendeur de clés à prix bas. Vérifie la région d'activation avant d'acheter." }
+];
+
+const normalize = (text) => String(text).toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function findShop(storeName) {
+  const key = normalize(storeName);
+  return SHOPS.find((shop) => [shop.name, ...(shop.aliases || [])].some((n) => normalize(n) === key));
+}
+
+// Une boutique est "suivie" si CheapShark la connaît et qu'elle est active
+function isTracked(shop) {
+  return Object.values(stores).some((s) => s.active && findShop(s.name) === shop);
+}
+
+function renderShops() {
+  const listLoaded = Object.keys(stores).length > 0;
+  document.getElementById("shops").innerHTML = SHOPS.map((shop) => {
+    const tracked = listLoaded && isTracked(shop);
+    return `
+      <article class="shop">
+        <div class="shop-head">
+          <h3>${escapeHtml(shop.name)}</h3>
+          <a href="${escapeHtml(shop.url)}" target="_blank" rel="noopener">${escapeHtml(new URL(shop.url).hostname.replace(/^www\./, ""))}</a>
+        </div>
+        <p>${escapeHtml(shop.description)}</p>
+        <div class="shop-tags">
+          <span class="tag ${tracked ? "tag-ok" : ""}">${tracked ? "Prix comparés" : "Lien direct uniquement"}</span>
+          ${shop.kind === "reseller" ? '<span class="tag tag-warn">Revendeur de clés</span>' : ""}
+        </div>
+      </article>`;
+  }).join("");
+}
+
 let stores = {};
 
 async function loadStores() {
@@ -197,6 +251,14 @@ async function openGame(gameID) {
     const offers = [...data.deals].sort((a, b) => Number(a.price) - Number(b.price));
     const lowest = data.cheapestPriceEver;
 
+    // Comparaison : écart entre l'offre la moins chère et la plus chère
+    const cheapest = offers.length ? Number(offers[0].price) : 0;
+    const priciest = offers.length ? Number(offers[offers.length - 1].price) : 0;
+    const gap = priciest - cheapest;
+
+    // Boutiques dont les prix ne sont pas suivis : on propose un lien pour vérifier soi-même
+    const untracked = Object.keys(stores).length ? SHOPS.filter((shop) => !isTracked(shop)) : [];
+
     dialogContent.innerHTML = `
       ${imgTag(data.info.steamAppID, data.info.thumb, "detail-cover")}
       <div class="detail-body">
@@ -205,6 +267,12 @@ async function openGame(gameID) {
           <span>Plus bas prix historique : <strong>${formatPrice(lowest.price)}</strong></span>
           <span>le ${formatDate(lowest.date)}</span>
         </div>` : ""}
+        ${offers.length > 1 ? `<p class="compare">
+          ${offers.length} offres comparées.
+          ${gap > 0.009
+            ? `Tu économises <strong>${formatPrice(gap)}</strong> par rapport à la boutique la plus chère.`
+            : "Le prix est identique partout."}
+        </p>` : ""}
         <ul class="offers">
           ${offers.map((o, i) => `
             <li class="offer${i === 0 ? " best" : ""}">
@@ -219,6 +287,13 @@ async function openGame(gameID) {
               <a class="btn" href="${dealLink(o.dealID)}" target="_blank" rel="noopener nofollow">Voir l'offre</a>
             </li>`).join("")}
         </ul>
+        ${untracked.length ? `<div class="also">
+          <h3>Vérifier aussi sur</h3>
+          <p>Prix non suivis automatiquement : compare toi-même sur ces boutiques.</p>
+          <div class="also-links">
+            ${untracked.map((shop) => `<a href="${escapeHtml(shop.url)}" target="_blank" rel="noopener">${escapeHtml(shop.name)}${shop.kind === "reseller" ? " (revendeur de clés)" : ""}</a>`).join("")}
+          </div>
+        </div>` : ""}
       </div>`;
   } catch (err) {
     dialogContent.innerHTML = `<div class="detail-body">${message(err.message, true)}</div>`;
@@ -236,4 +311,7 @@ dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(
 
 // --- Démarrage ----------------------------------------------------------
 
-loadStores().then(() => loadDeals("Deal Rating"));
+loadStores().then(() => {
+  renderShops();
+  loadDeals("Deal Rating");
+});
