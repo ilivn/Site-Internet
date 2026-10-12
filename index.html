@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LootRadar — Comparateur de prix de jeux PC</title>
+  <meta name="description" content="Trouvez le prix le plus bas d'un jeu PC parmi plus de 30 boutiques officielles : Steam, GOG, Epic, Humble, Fanatical…">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="./" aria-label="LootRadar, accueil">
+        <span class="logo-mark" aria-hidden="true"></span>
+        Loot<span>Radar</span>
+      </a>
+      <p class="tagline">Le prix le plus bas, sans fouiller 30 boutiques.</p>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <h1>Quel jeu cherches-tu&nbsp;?</h1>
+        <form class="search" role="search" id="search-form">
+          <label for="search-input" class="visually-hidden">Rechercher un jeu PC</label>
+          <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search-input" type="search" placeholder="Ex. : Hollow Knight, Elden Ring, Stardew Valley…" autocomplete="off" spellcheck="false">
+          <button type="button" id="clear-search" class="clear-btn" aria-label="Effacer la recherche" hidden>×</button>
+        </form>
+        <p class="hint">Prix en dollars US, issus de plus de 30 boutiques officielles.</p>
+      </div>
+    </section>
+
+    <section class="container" id="results-section" hidden aria-live="polite">
+      <h2 class="section-title" id="results-title">Résultats</h2>
+      <div class="grid" id="results"></div>
+    </section>
+
+    <section class="container" id="deals-section">
+      <div class="section-head">
+        <h2 class="section-title">Bons plans du moment</h2>
+        <div class="tabs" role="tablist" aria-label="Type de bons plans">
+          <button role="tab" class="tab" aria-selected="true" data-sort="Deal Rating">Meilleures affaires</button>
+          <button role="tab" class="tab" aria-selected="false" data-sort="Savings">Plus grosses remises</button>
+          <button role="tab" class="tab" aria-selected="false" data-sort="Deal Rating" data-max="5">Moins de 5 $</button>
+        </div>
+      </div>
+      <div class="grid" id="deals" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <dialog id="game-dialog" aria-labelledby="dialog-title">
+    <button class="dialog-close" id="dialog-close" aria-label="Fermer">×</button>
+    <div id="dialog-content"></div>
+  </dialog>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Données de prix fournies par <a href="https://www.cheapshark.com" target="_blank" rel="noopener">CheapShark</a>. Les prix peuvent changer à tout moment : vérifiez-les sur la boutique avant d'acheter.</p>
+      <p>Projet portfolio BTS SIO — réalisé par Ilian SEGHIRI.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
